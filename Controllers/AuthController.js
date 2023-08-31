@@ -30,13 +30,7 @@ exports.signUpUser = async (req, res) => {
           maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
           secure: process.env.NODE_ENV === "production", // Use secure cookie in production
         })
-        // .send({
-        //   msg: "Successfully Created!",
-        //   data: {
-        //     user: { username: newUser.username, _id: newUser._id },
-        //     token: token,
-        //   },
-        // })
+
         .json(newUser);
     }
   } catch (err) {
@@ -51,11 +45,6 @@ exports.loginUser = async (req, res) => {
 
   try {
     const user = await User.findOne({ email: email }); // Using findOne instead of find
-    // if (loginUser && loginUser.password === password) {
-    //   res.status(200).json(loginUser);
-    // } else {
-    //   res.status(401).json({ message: "Invalid email or password" });
-    // }
 
     if (user) {
       const isLoggedin = await compare(req.query.password, user.password);
@@ -75,10 +64,12 @@ exports.loginUser = async (req, res) => {
             secure: process.env.NODE_ENV === "production", // Use secure cookie in production
           })
           .status(200)
-          .json(user);
+          .json(token);
       } else {
         res.status(401).json({ message: "Invalid email or password" });
       }
+    } else {
+      res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (err) {
     res
